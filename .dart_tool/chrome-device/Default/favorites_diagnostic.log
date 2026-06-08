@@ -1,0 +1,187 @@
+2026-05-29 11:11:01.444: [INFO] VisibilityChanged: 0
+2026-05-29 11:11:01.492: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.493: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.494: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.494: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.495: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.495: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.495: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.496: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.496: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.497: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.497: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.498: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:01.504: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-05-29 11:11:01.504: [INFO] OnDoneLoading sync enabled: 0
+2026-05-29 11:11:01.544: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:03.568: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-05-29 11:11:03.571: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-05-29 11:11:03.572: [INFO] Primary account changed.
+2026-05-29 11:11:03.572: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-05-29 11:11:03.574: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-05-29 11:11:03.590: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-05-29 11:11:05.951: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.952: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.953: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.953: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.954: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.954: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.955: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.955: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.955: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.956: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.956: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.956: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.957: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.957: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.957: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.957: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.957: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.957: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.958: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.958: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.958: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.959: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.959: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.959: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.960: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.960: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.960: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.961: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.961: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.961: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.961: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.961: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.961: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.961: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.962: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.962: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.962: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.962: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.962: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.962: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.962: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.963: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.963: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.963: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.963: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.963: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.963: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.964: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.964: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.964: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.964: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.964: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.964: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.964: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.965: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.965: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.965: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.966: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.966: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.967: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.967: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.967: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.968: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.968: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.968: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.969: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:05.969: [INFO] BookmarkNodeAdded, ABU: 0
+2026-05-29 11:11:06.614: [INFO] Sync initialization duration: 2970ms
+2026-05-29 11:11:17.020: [INFO] Primary account changed.
+2026-05-29 11:11:17.020: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kNone
+2026-05-29 11:11:17.027: [INFO] Primary account changed.
+2026-05-29 11:11:17.027: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kCleared
+2026-05-29 12:11:50.487: [INFO] OnDoneLoading sync enabled: 0
+2026-05-29 12:11:50.551: [INFO] VisibilityChanged: 0
+2026-05-29 12:13:11.691: [INFO] Primary account changed.
+2026-05-29 12:13:11.691: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-05-29 12:13:17.031: [INFO] Sync initialization duration: 86544ms
+2026-05-30 16:01:42.668: [INFO] OnDoneLoading sync enabled: 1
+2026-05-30 16:01:42.766: [INFO] VisibilityChanged: 0
+2026-05-30 16:01:50.076: [INFO] Sync initialization duration: 1329ms
+2026-05-31 03:52:11.751: [INFO] OnDoneLoading sync enabled: 0
+2026-05-31 03:52:11.844: [INFO] VisibilityChanged: 0
+2026-05-31 03:52:12.609: [INFO] Primary account changed.
+2026-05-31 03:52:12.609: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-05-31 03:52:15.529: [INFO] Sync initialization duration: 3777ms
+2026-06-03 21:12:15.784: [INFO] OnDoneLoading sync enabled: 1
+2026-06-03 21:12:15.875: [INFO] VisibilityChanged: 0
+2026-06-03 21:12:23.275: [INFO] Sync initialization duration: 1287ms
+2026-06-04 03:05:23.164: [INFO] OnDoneLoading sync enabled: 0
+2026-06-04 03:05:23.236: [INFO] VisibilityChanged: 0
+2026-06-04 03:05:25.092: [INFO] Primary account changed.
+2026-06-04 03:05:25.092: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-04 03:05:28.939: [INFO] Sync initialization duration: 5775ms
+2026-06-04 03:15:16.447: [INFO] OnDoneLoading sync enabled: 1
+2026-06-04 03:15:16.529: [INFO] VisibilityChanged: 0
+2026-06-04 03:15:22.843: [INFO] Sync initialization duration: 1149ms
+2026-06-04 03:19:04.457: [INFO] OnDoneLoading sync enabled: 0
+2026-06-04 03:19:04.580: [INFO] VisibilityChanged: 0
+2026-06-04 03:19:05.019: [INFO] Primary account changed.
+2026-06-04 03:19:05.019: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-04 03:19:07.571: [INFO] Sync initialization duration: 3113ms
+2026-06-04 03:39:18.653: [INFO] OnDoneLoading sync enabled: 0
+2026-06-04 03:39:18.726: [INFO] VisibilityChanged: 0
+2026-06-04 03:39:20.157: [INFO] Primary account changed.
+2026-06-04 03:39:20.157: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-04 03:39:23.350: [INFO] Sync initialization duration: 4697ms
+2026-06-04 03:42:14.313: [INFO] OnDoneLoading sync enabled: 1
+2026-06-04 03:42:14.410: [INFO] VisibilityChanged: 0
+2026-06-04 03:42:20.853: [INFO] Sync initialization duration: 879ms
+2026-06-04 03:44:44.289: [INFO] OnDoneLoading sync enabled: 0
+2026-06-04 03:44:44.388: [INFO] VisibilityChanged: 0
+2026-06-04 03:44:45.821: [INFO] Primary account changed.
+2026-06-04 03:44:45.821: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-04 03:44:48.386: [INFO] Sync initialization duration: 4096ms
+2026-06-04 03:50:26.800: [INFO] OnDoneLoading sync enabled: 1
+2026-06-04 03:50:26.902: [INFO] VisibilityChanged: 0
+2026-06-04 03:50:33.233: [INFO] Sync initialization duration: 991ms
+2026-06-04 03:54:48.171: [INFO] OnDoneLoading sync enabled: 0
+2026-06-04 03:54:48.284: [INFO] VisibilityChanged: 0
+2026-06-04 03:54:48.742: [INFO] Primary account changed.
+2026-06-04 03:54:48.742: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-04 03:54:51.691: [INFO] Sync initialization duration: 3519ms
+2026-06-04 04:02:04.303: [INFO] OnDoneLoading sync enabled: 1
+2026-06-04 04:02:04.402: [INFO] VisibilityChanged: 0
+2026-06-04 04:02:11.073: [INFO] Sync initialization duration: 1230ms
+2026-06-04 04:03:43.236: [INFO] OnDoneLoading sync enabled: 0
+2026-06-04 04:03:43.320: [INFO] VisibilityChanged: 0
+2026-06-04 04:03:43.917: [INFO] Primary account changed.
+2026-06-04 04:03:43.917: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-04 04:03:45.844: [INFO] Sync initialization duration: 2608ms
+2026-06-04 04:14:27.028: [INFO] OnDoneLoading sync enabled: 1
+2026-06-04 04:14:27.160: [INFO] VisibilityChanged: 0
+2026-06-04 04:14:34.559: [INFO] Sync initialization duration: 1798ms
+2026-06-04 04:29:26.908: [INFO] OnDoneLoading sync enabled: 0
+2026-06-04 04:29:26.986: [INFO] VisibilityChanged: 0
+2026-06-04 04:29:27.425: [INFO] Primary account changed.
+2026-06-04 04:29:27.425: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-04 04:29:30.063: [INFO] Sync initialization duration: 3155ms
+2026-06-04 04:30:34.163: [INFO] OnDoneLoading sync enabled: 1
+2026-06-04 04:30:34.260: [INFO] VisibilityChanged: 0
+2026-06-04 04:30:40.479: [INFO] Sync initialization duration: 1127ms
+2026-06-04 04:31:19.489: [INFO] OnDoneLoading sync enabled: 0
+2026-06-04 04:31:19.587: [INFO] VisibilityChanged: 0
+2026-06-04 04:31:20.000: [INFO] Primary account changed.
+2026-06-04 04:31:20.000: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-04 04:31:22.005: [INFO] Sync initialization duration: 2515ms
+2026-06-04 04:31:51.861: [INFO] OnDoneLoading sync enabled: 1
+2026-06-04 04:31:51.954: [INFO] VisibilityChanged: 0
+2026-06-04 04:31:58.438: [INFO] Sync initialization duration: 984ms
+2026-06-04 09:42:54.938: [INFO] OnDoneLoading sync enabled: 0
+2026-06-04 09:42:55.035: [INFO] VisibilityChanged: 0
+2026-06-04 09:42:55.778: [INFO] Primary account changed.
+2026-06-04 09:42:55.778: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-04 09:42:59.836: [INFO] Sync initialization duration: 4898ms
+2026-06-07 08:29:38.883: [INFO] OnDoneLoading sync enabled: 1
+2026-06-07 08:29:38.990: [INFO] VisibilityChanged: 0
+2026-06-07 08:29:46.313: [INFO] Sync initialization duration: 1377ms
+2026-06-08 07:20:31.339: [INFO] OnDoneLoading sync enabled: 0
+2026-06-08 07:20:31.448: [INFO] VisibilityChanged: 0
+2026-06-08 07:20:32.081: [INFO] Primary account changed.
+2026-06-08 07:20:32.081: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-06-08 07:20:39.457: [INFO] Sync initialization duration: 8116ms
+2026-06-08 07:24:17.473: [INFO] OnDoneLoading sync enabled: 1
+2026-06-08 07:24:17.572: [INFO] VisibilityChanged: 0
+2026-06-08 07:24:33.649: [INFO] Sync initialization duration: 10623ms
