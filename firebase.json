@@ -1,0 +1,29 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "e-attend-e95ad",
+          "appId": "1:887912872289:android:6f7046731bad731d2cad20",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "e-attend-e95ad",
+          "configurations": {
+            "android": "1:887912872289:android:6f7046731bad731d2cad20",
+            "ios": "1:887912872289:ios:0a442a966b9460d72cad20",
+            "web": "1:887912872289:web:2555ebde2852e24c2cad20"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}
