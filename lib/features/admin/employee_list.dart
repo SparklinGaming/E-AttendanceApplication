@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../repositories/user_repository.dart';
+import '../../utils/empty_state_widget.dart';
 import 'employee_detail.dart';
 import 'add_employee.dart';
 
@@ -21,7 +22,11 @@ class EmployeeListPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No employees found.'));
+            return const EmptyStateWidget(
+              icon: Icons.people_outline,
+              title: 'No Employees Yet',
+              subtitle: 'Tap the + button to add your first employee.',
+            );
           }
 
           return ListView.builder(

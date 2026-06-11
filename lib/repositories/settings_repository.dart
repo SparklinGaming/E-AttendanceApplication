@@ -67,6 +67,35 @@ class SettingsRepository {
     return List<String>.from(data['dates']);
   }
 
+  // ── Office Location (for GPS geofencing) ────────────────────────────
+
+  /// Saves the office location coordinates and allowed geofence radius.
+  Future<void> setOfficeLocation({
+    required double latitude,
+    required double longitude,
+    required double radiusMeters,
+  }) {
+    return _firestore.collection('settings').doc('office_location').set({
+      'latitude': latitude,
+      'longitude': longitude,
+      'radiusMeters': radiusMeters,
+    }, SetOptions(merge: true));
+  }
+
+  /// Returns office location config or null if not set.
+  Future<Map<String, dynamic>?> getOfficeLocation() async {
+    final doc =
+        await _firestore.collection('settings').doc('office_location').get();
+    final data = doc.data();
+    if (!doc.exists || data == null) return null;
+    return data;
+  }
+
+  /// Deletes the office location config (disables GPS geofencing).
+  Future<void> deleteOfficeLocation() {
+    return _firestore.collection('settings').doc('office_location').delete();
+  }
+
   // ── Combined config (convenience) ────────────────────────────────────
 
   /// Fetches work timing, working days and holidays in one go.

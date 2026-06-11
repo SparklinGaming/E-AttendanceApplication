@@ -9,7 +9,9 @@ import 'features/auth/login.dart';
 import 'features/home/home.dart';
 import 'features/admin/admin_home.dart';
 import 'providers/current_user_provider.dart';
+import 'providers/theme_provider.dart';
 import 'services/auth_service.dart';
+import 'utils/theme_helper.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -96,17 +98,33 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => CurrentUserProvider()..start(),
-      child: MaterialApp(
-        title: 'E-ATTEND',
-        debugShowCheckedModeBanner: false,
-        navigatorKey: navigatorKey,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFFD95A)),
-          useMaterial3: true,
-        ),
-        home: const AuthWrapper(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CurrentUserProvider()..start()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          // Load the persisted theme once the user profile is available.
+          if (!themeProvider.isLoaded) {
+            final userProvider = context.read<CurrentUserProvider>();
+            if (!userProvider.isLoading) {
+              themeProvider.load(userProvider: userProvider);
+            }
+          }
+
+          return MaterialApp(
+            title: 'E-ATTEND',
+            debugShowCheckedModeBanner: false,
+            navigatorKey: navigatorKey,
+            theme: ThemeHelper.lightTheme(),
+            darkTheme: ThemeHelper.darkTheme(),
+            themeMode: themeProvider.isLoaded
+                ? themeProvider.themeMode
+                : ThemeMode.light,
+            home: const AuthWrapper(),
+          );
+        },
       ),
     );
   }

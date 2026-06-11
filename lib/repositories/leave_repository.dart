@@ -70,6 +70,14 @@ class LeaveRepository {
     });
   }
 
+  Stream<QuerySnapshot> getUserLeaves(String uid) {
+    return _firestore
+        .collection('leaves')
+        .where('uid', isEqualTo: uid)
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
+
   Future<void> deleteLeave(String docId) {
     return _firestore.collection('leaves').doc(docId).delete();
   }

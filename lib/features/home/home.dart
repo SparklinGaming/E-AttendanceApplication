@@ -6,7 +6,9 @@ import '../../providers/current_user_provider.dart';
 import '../../repositories/attendance_repository.dart';
 import '../../repositories/settings_repository.dart';
 import '../../repositories/shift_repository.dart';
-import '../../utils/stats_helper.dart';
+import '../../repositories/notification_repository.dart';
+import '../../services/geolocation_service.dart';
+import '../../utils/empty_state_widget.dart';
 import '../notifications/notification.dart';
 import '../profile/profile.dart';
 import '../schedule/schedule.dart';
@@ -103,6 +105,12 @@ class _HomePageState extends State<HomePage> {
             return tB.compareTo(tA);
           });
 
+          // Filter to current month for recent activity
+          final currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
+          final monthDocs = allDocs
+              .where((doc) => (doc['date'] as String).startsWith(currentMonth))
+              .toList();
+
           // Filter today's records
           String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
           List<QueryDocumentSnapshot> todayDocs =
@@ -154,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                     horizontal: 16,
                     vertical: 24,
                   ),
-                  child: _buildRecentActivity(allDocs),
+                  child: _buildRecentActivity(monthDocs),
                 ),
               ),
             ],
@@ -211,17 +219,12 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(width: 10),
-              GestureDetector(
+              _NotificationBadge(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => const NotificationPage(),
                   ),
-                ),
-                child: const Icon(
-                  Icons.notifications,
-                  size: 28,
-                  color: Color(0xFF333333),
                 ),
               ),
             ],
@@ -439,7 +442,73 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () async {
                   final notes = notesController.text.trim();
                   Navigator.of(dialogContext).pop();
+
+                  // ── GPS Location Verification for Check In ────────
+                  double? lat;
+                  double? lng;
+                  if (type == 'Check In') {
+                    final office =
+                        await _settingsRepository.getOfficeLocation();
+                    if (office != null) {
+                      final geoService = GeolocationService();
+                      if (!mounted) return;
+                      // Show loading indicator
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Row(
+                            children: [
+                              SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white),
+                              ),
+                              SizedBox(width: 12),
+                              Text('Verifying your location...'),
+                            ],
+                          ),
+                          duration: Duration(seconds: 30),
+                        ),
+                      );
+
+                      final result = await geoService.validateLocation(
+                        officeLat: (office['latitude'] as num).toDouble(),
+                        officeLng: (office['longitude'] as num).toDouble(),
+                        allowedRadiusMeters:
+                            (office['radiusMeters'] as num).toDouble(),
+                      );
+
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+                      if (!result.success) {
+                        await showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            icon: const Icon(Icons.location_off,
+                                color: Colors.red, size: 48),
+                            title: const Text('Location Check Failed'),
+                            content: Text(
+                              result.errorMessage ??
+                                  'Could not verify your location.',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: const Text('Cancel'),
+                              ),
+                            ],
+                          ),
+                        );
+                        return;
+                      }
+                      lat = result.latitude;
+                      lng = result.longitude;
+                    }
+                  }
+
                   try {
+                    if (!mounted) return;
                     final uid = context.read<CurrentUserProvider>().uid;
                     if (uid == null) {
                       if (!mounted) return;
@@ -452,7 +521,12 @@ class _HomePageState extends State<HomePage> {
                       return;
                     }
                     if (type == 'Check In') {
-                      await _attendanceRepository.checkIn(uid, notes: notes);
+                      await _attendanceRepository.checkIn(
+                        uid,
+                        notes: notes,
+                        latitude: lat,
+                        longitude: lng,
+                      );
                     } else {
                       await _attendanceRepository.checkOut(uid, notes: notes);
                     }
@@ -550,25 +624,40 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildRecentActivity(List<QueryDocumentSnapshot> docs) {
+    const int maxItems = 10;
+    final limitedDocs =
+        docs.length > maxItems ? docs.sublist(0, maxItems) : docs;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           children: [
-            Icon(Icons.history_outlined),
-            SizedBox(width: 8),
-            Text(
+            const Icon(Icons.history_outlined),
+            const SizedBox(width: 8),
+            const Text(
               'Recent Activity',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
+            const Spacer(),
+            if (docs.length > maxItems)
+              Text(
+                'Last $maxItems',
+                style: const TextStyle(fontSize: 12, color: Colors.black45),
+              ),
           ],
         ),
         const SizedBox(height: 10),
         Expanded(
           child: docs.isEmpty
-              ? const Center(child: Text('No activity yet.'))
+              ? const EmptyStateWidget(
+                  icon: Icons.history_outlined,
+                  title: 'No Activity Yet',
+                  subtitle: 'Your check-in and check-out records will appear here.',
+                  iconSize: 48,
+                )
               : ListView.builder(
-                  itemCount: docs.length,
+                  itemCount: limitedDocs.length,
                   itemBuilder: (context, index) {
                     Map<String, dynamic> data =
                         docs[index].data() as Map<String, dynamic>;
@@ -635,5 +724,49 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+}
+
+/// A notification bell icon with a red badge showing unread count.
+class _NotificationBadge extends StatelessWidget {
+  const _NotificationBadge({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final user = context.watch<CurrentUserProvider>().user;
+    if (user == null) {
+      return const Icon(Icons.notifications, size: 28, color: Color(0xFF333333));
+    }
+
+    return StreamBuilder<int>(
+      stream: _unreadCountStream(user.uid),
+      builder: (context, snapshot) {
+        final count = snapshot.data ?? 0;
+        return GestureDetector(
+          onTap: onTap,
+          child: Badge(
+            isLabelVisible: count > 0,
+            label: Text(
+              count > 99 ? '99+' : count.toString(),
+              style: const TextStyle(fontSize: 10, color: Colors.white),
+            ),
+            child: const Icon(
+              Icons.notifications,
+              size: 28,
+              color: Color(0xFF333333),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Stream<int> _unreadCountStream(String uid) {
+    final repo = NotificationRepository();
+    return repo.getUserNotifications(uid).map((snapshot) {
+      return snapshot.docs.length;
+    });
   }
 }

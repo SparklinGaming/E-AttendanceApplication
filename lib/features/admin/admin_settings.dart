@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../repositories/settings_repository.dart';
 
 class AdminSettingsPage extends StatefulWidget {
@@ -20,6 +21,12 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
   // National holidays (yyyy-MM-dd strings)
   List<String> _holidays = [];
 
+  // Office location for GPS geofencing
+  final TextEditingController _officeLatController = TextEditingController();
+  final TextEditingController _officeLngController = TextEditingController();
+  final TextEditingController _officeRadiusController = TextEditingController();
+  bool _gpsEnabled = false;
+
   bool _isLoading = true;
 
   static const List<String> _dayLabels = [
@@ -38,8 +45,17 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
     _loadSettings();
   }
 
+  @override
+  void dispose() {
+    _officeLatController.dispose();
+    _officeLngController.dispose();
+    _officeRadiusController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadSettings() async {
     final config = await _settingsRepository.getFullWorkConfig();
+    final office = await _settingsRepository.getOfficeLocation();
     if (!mounted) return;
     setState(() {
       if (config != null) {
@@ -55,6 +71,12 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
         if (config['holidays'] != null) {
           _holidays = List<String>.from(config['holidays']);
         }
+      }
+      if (office != null) {
+        _officeLatController.text = office['latitude'].toString();
+        _officeLngController.text = office['longitude'].toString();
+        _officeRadiusController.text = office['radiusMeters'].toString();
+        _gpsEnabled = true;
       }
       _isLoading = false;
     });
@@ -112,6 +134,24 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
     await _settingsRepository.setWorkSettings(_startTime, _endTime);
     await _settingsRepository.setWorkingDays(_workingDays);
     await _settingsRepository.setHolidays(_holidays);
+
+    // Save office location (GPS geofencing)
+    if (_gpsEnabled) {
+      final lat = double.tryParse(_officeLatController.text);
+      final lng = double.tryParse(_officeLngController.text);
+      final radius = double.tryParse(_officeRadiusController.text);
+      if (lat != null && lng != null && radius != null && radius > 0) {
+        await _settingsRepository.setOfficeLocation(
+          latitude: lat,
+          longitude: lng,
+          radiusMeters: radius,
+        );
+      }
+    } else {
+      // Delete office location to disable GPS check
+      await _settingsRepository.deleteOfficeLocation();
+    }
+
     setState(() => _isLoading = false);
     if (mounted) {
       ScaffoldMessenger.of(context)
@@ -222,6 +262,149 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
                       );
                     },
                   ),
+
+                const SizedBox(height: 30),
+
+                // ── Office Location (GPS Geofencing) ────────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Office Location (GPS)",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Switch(
+                      value: _gpsEnabled,
+                      onChanged: (val) =>
+                          setState(() => _gpsEnabled = val),
+                      activeColor: Colors.blue,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  "When enabled, employees must be within the geofence radius "
+                  "to check in. Disable to allow check-in from anywhere.",
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 12),
+                if (_gpsEnabled) ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _officeLatController,
+                          decoration: const InputDecoration(
+                            labelText: 'Latitude',
+                            hintText: '-6.2088',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                          keyboardType:
+                              const TextInputType.numberWithOptions(
+                                  decimal: true, signed: true),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: _officeLngController,
+                          decoration: const InputDecoration(
+                            labelText: 'Longitude',
+                            hintText: '106.8456',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                          keyboardType:
+                              const TextInputType.numberWithOptions(
+                                  decimal: true, signed: true),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.my_location, size: 18),
+                      label: const Text('Use My Current Location'),
+                      onPressed: () async {
+                        try {
+                          bool serviceEnabled =
+                              await Geolocator.isLocationServiceEnabled();
+                          if (!serviceEnabled) {
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Please enable GPS location services.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                          LocationPermission permission =
+                              await Geolocator.checkPermission();
+                          if (permission == LocationPermission.denied) {
+                            permission =
+                                await Geolocator.requestPermission();
+                          }
+                          if (permission == LocationPermission.denied ||
+                              permission ==
+                                  LocationPermission.deniedForever) {
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Location permission is required.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                          final pos = await Geolocator.getCurrentPosition(
+                            locationSettings: const LocationSettings(
+                                accuracy: LocationAccuracy.high),
+                          );
+                          if (!mounted) return;
+                          setState(() {
+                            _officeLatController.text =
+                                pos.latitude.toStringAsFixed(6);
+                            _officeLngController.text =
+                                pos.longitude.toStringAsFixed(6);
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Location set to your current position!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } catch (e) {
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('Failed to get location: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _officeRadiusController,
+                    decoration: const InputDecoration(
+                      labelText: 'Geofence Radius (meters)',
+                      hintText: '100',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      suffixText: 'm',
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
 
                 const SizedBox(height: 40),
 

@@ -118,12 +118,14 @@ class StatsHelper {
     List<String>? holidays,
   }) {
     DateTime now = DateTime.now();
+    // Start from Sunday of the current calendar week
+    final sunday = now.subtract(Duration(days: now.weekday % 7));
     final result = <WeeklyDayData>[];
     final wDays = workingDays ?? [1, 2, 3, 4, 5];
     final holidaySet = Set<String>.from(holidays ?? []);
 
     for (int i = 0; i < 7; i++) {
-      DateTime targetDate = now.subtract(Duration(days: 6 - i));
+      DateTime targetDate = sunday.add(Duration(days: i));
       String dateStr = DateFormat('yyyy-MM-dd').format(targetDate);
 
       final bool isWeekend = !wDays.contains(targetDate.weekday);

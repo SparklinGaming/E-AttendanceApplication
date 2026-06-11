@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +7,7 @@ import '../../repositories/overtime_repository.dart';
 import '../../repositories/shift_repository.dart';
 import '../../repositories/settings_repository.dart';
 
-/// Employee overtime request form (Bahasa Indonesia UI).
+/// Employee overtime request form.
 class OvertimeRequestPage extends StatefulWidget {
   const OvertimeRequestPage({super.key});
 
@@ -45,7 +44,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
   final TextEditingController _notesCtrl = TextEditingController();
 
   // ── Attachment ────────────────────────────────────────────────────
-  File? _attachmentFile;
+  XFile? _attachmentFile;
   bool _uploading = false;
 
   // ── Calculated ────────────────────────────────────────────────────
@@ -70,12 +69,12 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
 
   String get _durationText {
     final d = _durationHours;
-    if (d <= 0) return '0 jam';
+    if (d <= 0) return '0 hr';
     final h = d.floor();
     final m = ((d - h) * 60).round();
-    if (h > 0 && m > 0) return '$h jam $m menit';
-    if (h > 0) return '$h jam';
-    return '$m menit';
+    if (h > 0 && m > 0) return '$h hr $m min';
+    if (h > 0) return '$h hr';
+    return '$m min';
   }
 
   // ── Init ──────────────────────────────────────────────────────────
@@ -162,20 +161,20 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
     final source = await showDialog<ImageSource>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Lampiran'),
-        content: const Text('Pilih sumber gambar'),
+        title: const Text('Attachment'),
+        content: const Text('Choose image source'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, ImageSource.camera),
-            child: const Text('Kamera'),
+            child: const Text('Camera'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
-            child: const Text('Galeri'),
+            child: const Text('Gallery'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
+            child: const Text('Cancel'),
           ),
         ],
       ),
@@ -190,7 +189,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
       imageQuality: 70,
     );
     if (picked != null && mounted) {
-      setState(() => _attachmentFile = File(picked.path));
+      setState(() => _attachmentFile = picked);
     }
   }
 
@@ -201,12 +200,12 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
     final d = _durationHours;
     if (d <= 0) {
       _showError(
-          'Waktu lembur tidak valid. Pastikan jam selesai setelah jam mulai.');
+          'Invalid overtime time. Make sure end time is after start time.');
       return;
     }
     if (d > 4) {
       _showError(
-          'Lembur maksimal 4 jam per hari (sesuai peraturan PP 35/2021).');
+          'Overtime max 4 hours per day (per regulation PP 35/2021).');
       return;
     }
 
@@ -227,7 +226,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
     );
     if (otStartDt.isBefore(shiftEnd)) {
       _showError(
-          'Jam mulai lembur harus setelah atau sama dengan jam selesai kerja ($_shiftEnd).');
+          'Overtime start must be after or equal to work end time ($_shiftEnd).');
       return;
     }
 
@@ -238,7 +237,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
     final name = userProvider.displayName;
 
     if (uid == null) {
-      _showError('Anda belum login.');
+      _showError('You are not logged in.');
       return;
     }
 
@@ -247,7 +246,8 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
       String? attachmentUrl;
       if (_attachmentFile != null) {
         setState(() => _uploading = true);
-        attachmentUrl = await _otRepo.uploadAttachment(uid, _attachmentFile!);
+        final bytes = await _attachmentFile!.readAsBytes();
+        attachmentUrl = await _otRepo.uploadAttachment(uid, bytes);
       }
 
       final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
@@ -283,14 +283,14 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
       if (!mounted) return;
       messenger.showSnackBar(
         const SnackBar(
-          content: Text('Pengajuan lembur berhasil dikirim!'),
+          content: Text('Overtime request submitted successfully!'),
           backgroundColor: Colors.green,
         ),
       );
       navigator.pop();
     } catch (e) {
       if (!mounted) return;
-      _showError('Gagal mengirim: $e');
+      _showError('Failed to submit: $e');
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
@@ -307,7 +307,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pengajuan Lembur'),
+        title: const Text('Overtime Request'),
         actions: [
           TextButton(
             onPressed: _uploading ? null : _submit,
@@ -317,7 +317,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Kirim',
+                : const Text('Send',
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
@@ -335,7 +335,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                     // ── Date & Schedule card ─────────────────────
                     _Card(
                       children: [
-                        _Label('Tanggal jadwal kerja'),
+                        _Label('Work schedule date'),
                         _TapField(
                           value: DateFormat('EEEE, dd MMM yyyy')
                               .format(_selectedDate),
@@ -345,7 +345,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            const _Label('Jam kerja'),
+                            const _Label('Work hours'),
                             const Spacer(),
                             if (_shiftName != null)
                               Container(
@@ -376,14 +376,14 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                     // ── Overtime times ───────────────────────────
                     _Card(
                       children: [
-                        const _Label('Mulai lembur'),
+                        const _Label('Overtime start'),
                         _TapField(
                           value: _otStart.format(context),
                           icon: Icons.schedule,
                           onTap: () => _pickTime(true),
                         ),
                         const SizedBox(height: 12),
-                        const _Label('Selesai lembur'),
+                        const _Label('Overtime end'),
                         _TapField(
                           value: _otEnd.format(context),
                           icon: Icons.schedule,
@@ -402,7 +402,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                             const Icon(Icons.timer_outlined,
                                 size: 18, color: Colors.blue),
                             const SizedBox(width: 8),
-                            const Text('Durasi lembur',
+                            const Text('Overtime duration',
                                 style: TextStyle(fontWeight: FontWeight.w600)),
                             const Spacer(),
                             Text(_durationText,
@@ -414,7 +414,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Maksimal 4 jam/hari (PP 35/2021)',
+                          'Max 4 hours/day (PP 35/2021)',
                           style:
                               TextStyle(fontSize: 11, color: Colors.grey[600]),
                         ),
@@ -428,7 +428,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                         Row(
                           children: [
                             const Expanded(
-                              child: _Label('Jumlah jam istirahat'),
+                              child: _Label('Break hours'),
                             ),
                             SizedBox(
                               width: 120,
@@ -460,13 +460,13 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                     // ── Compensation type ────────────────────────
                     _Card(
                       children: [
-                        const _Label('Dapat replacement off'),
+                        const _Label('Compensation type'),
                         const SizedBox(height: 8),
                         _CompensationOption(
                           value: 'upah_lembur',
                           groupValue: _compensationType,
-                          title: 'Upah lembur',
-                          subtitle: 'Dibayar sesuai peraturan ketenagakerjaan',
+                          title: 'Overtime wage',
+                          subtitle: 'Paid according to labor regulations',
                           onChanged: (v) =>
                               setState(() => _compensationType = v!),
                         ),
@@ -475,7 +475,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                           value: 'replacement_off',
                           groupValue: _compensationType,
                           title: 'Replacement off',
-                          subtitle: 'Diganti hari libur di lain waktu',
+                          subtitle: 'Compensated with another day off',
                           onChanged: (v) =>
                               setState(() => _compensationType = v!),
                         ),
@@ -489,12 +489,12 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                         Row(
                           children: [
                             const Expanded(
-                              child: _Label('Lampiran'),
+                              child: _Label('Attachment'),
                             ),
                             TextButton.icon(
                               icon: const Icon(Icons.attach_file, size: 18),
                               label: Text(
-                                _attachmentFile != null ? 'Ganti' : 'Tambah',
+                                _attachmentFile != null ? 'Change' : 'Add',
                               ),
                               onPressed: _pickAttachment,
                             ),
@@ -516,7 +516,7 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    _attachmentFile!.path.split('/').last,
+                                    _attachmentFile!.name,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(fontSize: 13),
                                   ),
@@ -537,13 +537,13 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                     // ── Notes ────────────────────────────────────
                     _Card(
                       children: [
-                        const _Label('Keterangan'),
+                        const _Label('Notes'),
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _notesCtrl,
                           maxLines: 3,
                           decoration: const InputDecoration(
-                            hintText: 'Alasan dan detail pekerjaan lembur...',
+                            hintText: 'Reason and details of overtime work...',
                             border: OutlineInputBorder(),
                             isDense: true,
                           ),
@@ -562,15 +562,15 @@ class _OvertimeRequestPageState extends State<OvertimeRequestPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: const [
-                          Text('Ketentuan Lembur',
+                          Text('Overtime Regulations',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 13)),
                           SizedBox(height: 4),
                           Text(
-                            '• Maksimal 4 jam per hari / 18 jam per minggu\n'
-                            '• Jam pertama: 1,5× upah sejam\n'
-                            '• Jam berikutnya: 2× upah sejam\n'
-                            '• Lembur harus dengan persetujuan karyawan',
+                            '• Max 4 hours per day / 18 hours per week\n'
+                            '• 1st hour: 1.5× hourly wage\n'
+                            '• Next hours: 2× hourly wage\n'
+                            '• Overtime requires employee consent',
                             style: TextStyle(fontSize: 11, height: 1.5),
                           ),
                         ],

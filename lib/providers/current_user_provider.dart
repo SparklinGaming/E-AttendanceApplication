@@ -48,7 +48,13 @@ class CurrentUserProvider extends ChangeNotifier {
     _profile = null;
 
     if (user != null) {
-      _profile = await _userRepository.getUserData(user.uid);
+      try {
+        _profile = await _userRepository.getUserData(user.uid);
+      } catch (e, s) {
+        debugPrint('Failed to fetch user profile: $e');
+        debugPrintStack(stackTrace: s);
+        // Keep _profile as null — UI handles missing profile gracefully.
+      }
     }
 
     _isLoading = false;

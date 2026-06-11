@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -99,7 +99,7 @@ class OvertimeRepository {
     await _firestore.collection('notifications').add({
       'title': 'Overtime Request',
       'message':
-          '${request.name} mengajukan lembur ${request.durationHours.toStringAsFixed(1)} jam pada ${request.date}',
+          '${request.name} submitted overtime of ${request.durationHours.toStringAsFixed(1)} hours on ${request.date}',
       'created_at': FieldValue.serverTimestamp(),
       'target': 'admin',
     });
@@ -107,13 +107,13 @@ class OvertimeRepository {
 
   // ── Upload attachment ─────────────────────────────────────────────
 
-  Future<String> uploadAttachment(String uid, File file) async {
+  Future<String> uploadAttachment(String uid, Uint8List fileBytes) async {
     final ref = _storage
         .ref()
         .child('overtime_attachments')
         .child('${uid}_${DateTime.now().millisecondsSinceEpoch}.jpg');
-    await ref.putFile(
-      file,
+    await ref.putData(
+      fileBytes,
       SettableMetadata(contentType: 'image/jpeg'),
     );
     return ref.getDownloadURL();
@@ -148,7 +148,7 @@ class OvertimeRepository {
 
     await _firestore.collection('notifications').add({
       'title': 'Overtime $status',
-      'message': 'Pengajuan lembur Anda telah $status.',
+      'message': 'Your overtime request has been $status.',
       'created_at': FieldValue.serverTimestamp(),
       'uid': uid,
     });

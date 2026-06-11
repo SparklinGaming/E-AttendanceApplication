@@ -214,7 +214,34 @@ class _ProfilePageState extends State<ProfilePage> {
             return (config, shift);
           }(),
           builder: (context, settingsSnapshot) {
-            if (!settingsSnapshot.hasData) {
+            if (settingsSnapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline,
+                          size: 64, color: Colors.red),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Failed to load work configuration',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${settingsSnapshot.error}',
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.grey[600]),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            if (!settingsSnapshot.hasData || settingsSnapshot.data == null) {
               return const Center(child: CircularProgressIndicator());
             }
             final config = settingsSnapshot.data!.$1;
@@ -288,6 +315,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           ],
                         ),
                       ),
+
+                      // Leave Balance
+                      _LeaveBalanceCard(uid: uid),
 
                       // Late Warning
                       if (late > 3)
@@ -393,61 +423,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
 
-                      // Attendance History List
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Recent Activity",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: sortedDocs.length,
-                        itemBuilder: (context, index) {
-                          final data =
-                              sortedDocs[index].data() as Map<String, dynamic>;
-                          final bool isCheckIn = data['type'] == 'in';
-                          final Timestamp timeStamp = data['timestamp'];
-                          final String date = DateFormat(
-                            'dd MMM yyyy',
-                          ).format(timeStamp.toDate());
-                          final String time = DateFormat(
-                            'HH:mm',
-                          ).format(timeStamp.toDate());
+                      // Recent Activity (last 10, current month)
+                      _buildRecentActivity(sortedDocs),
 
-                          return Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: ListTile(
-                              leading: Icon(
-                                isCheckIn ? Icons.login : Icons.logout,
-                                color: isCheckIn ? Colors.green : Colors.red,
-                              ),
-                              title: Text(isCheckIn ? "Check In" : "Check Out",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              subtitle: Text(date),
-                              trailing: Text(
-                                time,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 12),
                       GestureDetector(
                         onTap: _logout,
                         child: Container(
@@ -457,7 +436,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             horizontal: 20,
                           ),
                           decoration: BoxDecoration(
-                            color: Color(0xfffff3cd),
+                            color: const Color(0xfffff3cd),
                             border: Border.all(color: Colors.red),
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -500,6 +479,17 @@ class _ProfilePageState extends State<ProfilePage> {
     return FutureBuilder<DocumentSnapshot>(
       future: _userRepository.getUserDocument(uid),
       builder: (context, snapshot) {
+        if (snapshot.hasError || (!snapshot.hasData && snapshot.connectionState != ConnectionState.waiting)) {
+          return const Column(
+            children: [
+              SizedBox(height: 20),
+              Icon(Icons.person, size: 80, color: Colors.grey),
+              SizedBox(height: 8),
+              Text('Failed to load profile',
+                  style: TextStyle(color: Colors.grey)),
+            ],
+          );
+        }
         if (!snapshot.hasData) {
           return const CircularProgressIndicator();
         }
@@ -596,5 +586,205 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildVerticalDivider() {
     return Container(height: 30, width: 1, color: Colors.white30);
+  }
+
+  Widget _buildRecentActivity(List<QueryDocumentSnapshot> docs) {
+    const int maxItems = 10;
+    // Filter to current month only
+    final currentMonth = DateFormat('yyyy-MM').format(DateTime.now());
+    final monthDocs = docs
+        .where((doc) {
+          final date = doc['date'] as String?;
+          return date != null && date.startsWith(currentMonth);
+        })
+        .toList();
+    final limitedDocs =
+        monthDocs.length > maxItems ? monthDocs.sublist(0, maxItems) : monthDocs;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Row(
+            children: [
+              const Icon(Icons.history_outlined, size: 20),
+              const SizedBox(width: 8),
+              const Text(
+                'Recent Activity',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              if (monthDocs.length > maxItems)
+                Text(
+                  'Last $maxItems',
+                  style: const TextStyle(fontSize: 12, color: Colors.black45),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (limitedDocs.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            child: Text(
+              'No activity this month.',
+              style: TextStyle(color: Colors.grey),
+            ),
+          )
+        else
+          ...limitedDocs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final bool isCheckIn = data['type'] == 'in';
+            final Timestamp timeStamp = data['timestamp'];
+            final String date =
+                DateFormat('dd MMM yyyy').format(timeStamp.toDate());
+            final String time =
+                DateFormat('HH:mm').format(timeStamp.toDate());
+
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ListTile(
+                dense: true,
+                leading: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: (isCheckIn ? Colors.green : Colors.red)
+                      .withAlpha((0.15 * 255).round()),
+                  child: Icon(
+                    isCheckIn ? Icons.login : Icons.logout,
+                    size: 16,
+                    color: isCheckIn ? Colors.green : Colors.red,
+                  ),
+                ),
+                title: Text(isCheckIn ? 'Check In' : 'Check Out',
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text(date, style: const TextStyle(fontSize: 12)),
+                trailing: Text(
+                  time,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            );
+          }),
+      ],
+    );
+  }
+}
+
+/// Displays remaining leave balance for the current employee.
+class _LeaveBalanceCard extends StatelessWidget {
+  const _LeaveBalanceCard({required this.uid});
+
+  final String uid;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, int>>(
+      future: UserRepository().getLeaveBalance(uid),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox.shrink();
+
+        final balance = snapshot.data!;
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.beach_access, color: Colors.teal, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Leave Balance',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.teal,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _balanceChip(
+                    Icons.event,
+                    'Annual',
+                    '${balance['annual'] ?? 0} days',
+                    Colors.blue,
+                  ),
+                  const SizedBox(width: 8),
+                  _balanceChip(
+                    Icons.star_border,
+                    'Special Leave',
+                    '${balance['special'] ?? 0} used',
+                    Colors.purple,
+                  ),
+                  const SizedBox(width: 8),
+                  _balanceChip(
+                    Icons.medical_services,
+                    'Sick',
+                    '${balance['sick'] ?? 0} used',
+                    Colors.red,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _balanceChip(IconData icon, String label, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 18),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: color,
+              ),
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

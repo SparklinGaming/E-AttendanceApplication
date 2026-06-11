@@ -16,5 +16,15 @@ service firebase.storage {
       allow write: if signedIn()
         && (fileName == request.auth.uid + '.jpg' || isAdmin());
     }
+
+    match /overtime_attachments/{fileName} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
+
+    match /issue_attachments/{fileName} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
   }
 }

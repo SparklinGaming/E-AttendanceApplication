@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import '../repositories/shift_repository.dart';
@@ -55,7 +56,7 @@ class AnalyticsService {
 
     for (var doc in attendanceSnapshot.docs) {
       final uid = doc['uid'];
-      final name = (doc.data() as Map<String, dynamic>).containsKey('name') ? doc['name'] : 'Unknown';
+      final name = (doc.data()).containsKey('name') ? doc['name'] : 'Unknown';
       final timestamp = doc['timestamp'] as Timestamp;
       final checkInTime = timestamp.toDate();
 
@@ -140,16 +141,22 @@ class AnalyticsService {
   }
 
   Future<Map<String, dynamic>> _getOvertimeStats() async {
-    // Mock collection since it might not exist yet
     int totalSubmissions = 0;
     int approved = 0;
     int totalHours = 0;
 
     try {
-      final overtimeSnapshot = await _firestore.collection('overtimes').get();
-      totalSubmissions = overtimeSnapshot.size;
+      final now = DateTime.now();
+      final currentMonthPrefix = DateFormat('yyyy-MM').format(now);
+
+      final overtimeSnapshot = await _firestore.collection('overtime_requests').get();
       for (var doc in overtimeSnapshot.docs) {
         final data = doc.data();
+        final date = data['date'] as String?;
+        // Only count this month
+        if (date == null || !date.startsWith(currentMonthPrefix)) continue;
+
+        totalSubmissions++;
         final status = data['status']?.toString().toLowerCase() ?? '';
         if (status == 'approved') {
           approved++;
@@ -157,7 +164,7 @@ class AnalyticsService {
         }
       }
     } catch (e) {
-      // ignore if collection doesn't exist
+      debugPrint('Error fetching overtime stats: $e');
     }
 
     return {

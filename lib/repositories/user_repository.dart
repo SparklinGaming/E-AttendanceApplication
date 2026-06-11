@@ -68,4 +68,25 @@ class UserRepository {
     );
     return ref.getDownloadURL();
   }
+
+  // ── Leave Balance ─────────────────────────────────────────────────────
+
+  Future<Map<String, int>> getLeaveBalance(String uid) async {
+    final doc = await _firestore.collection('users').doc(uid).get();
+    final data = doc.data();
+    if (data == null || data['leave_balance'] == null) {
+      // Defaults:
+      // annual: 12 days remaining (counts down when used)
+      // special: counts up from 0 when used
+      // sick: counts up from 0 when used
+      return {'annual': 12, 'special': 0, 'sick': 0};
+    }
+    return Map<String, int>.from(data['leave_balance']);
+  }
+
+  Future<void> setLeaveBalance(String uid, Map<String, int> balance) async {
+    await _firestore.collection('users').doc(uid).update({
+      'leave_balance': balance,
+    });
+  }
 }

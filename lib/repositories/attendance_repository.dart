@@ -9,7 +9,8 @@ class AttendanceRepository {
 
   String get _todayDate => DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-  Future<void> checkIn(String uid, {String? notes}) async {
+  Future<void> checkIn(String uid,
+      {String? notes, double? latitude, double? longitude}) async {
     final now = DateTime.now();
     final userDoc = await _firestore.collection('users').doc(uid).get();
     final name = userDoc.data()?['name'] ?? 'Unknown';
@@ -21,6 +22,10 @@ class AttendanceRepository {
       'type': 'in',
       'notes': notes,
       'timestamp': Timestamp.fromDate(now),
+      if (latitude != null && longitude != null) ...{
+        'latitude': latitude,
+        'longitude': longitude,
+      },
     });
   }
 

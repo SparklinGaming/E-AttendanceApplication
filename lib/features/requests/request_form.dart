@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../providers/current_user_provider.dart';
 import '../../repositories/leave_repository.dart';
+import '../../repositories/user_repository.dart';
+import 'overtime_request.dart';
 
 class RequestFormPage extends StatefulWidget {
   const RequestFormPage({super.key});
@@ -18,8 +20,8 @@ class _RequestFormPageState extends State<RequestFormPage> {
   String _selectedType = 'Annual Leave'; // Annual Leave
   final List<String> _types = [
     'Annual Leave',
-    'Emergency Leave',
-    'Medical Certificate'
+    'Special Leave',
+    'Sick Leave',
   ];
 
   final TextEditingController _dateController = TextEditingController();
@@ -62,6 +64,9 @@ class _RequestFormPageState extends State<RequestFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Leave Balance Banner
+              _LeaveBalanceBanner(uid: context.watch<CurrentUserProvider>().uid),
+              const SizedBox(height: 16),
               const Text("Request Type",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               DropdownButtonFormField<String>(
@@ -139,6 +144,53 @@ class _RequestFormPageState extends State<RequestFormPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Shows the remaining leave balance for the employee at the top of the form.
+class _LeaveBalanceBanner extends StatelessWidget {
+  const _LeaveBalanceBanner({required this.uid});
+
+  final String? uid;
+
+  @override
+  Widget build(BuildContext context) {
+    if (uid == null) return const SizedBox.shrink();
+
+    return FutureBuilder<Map<String, int>>(
+      future: UserRepository().getLeaveBalance(uid!),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox.shrink();
+
+        final balance = snapshot.data!;
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.teal.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.teal.withValues(alpha: 0.2)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.beach_access, color: Colors.teal, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Annual: ${balance['annual'] ?? 0}d  •  '
+                  'Special: ${balance['special'] ?? 0}d  •  '
+                  'Sick: ${balance['sick'] ?? 0}d',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.teal,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

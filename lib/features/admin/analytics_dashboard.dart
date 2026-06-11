@@ -6,6 +6,8 @@ import 'attendance_list_page.dart';
 import 'admin_shift_assignment.dart';
 import 'admin_shift_settings.dart';
 import 'all_leaves_page.dart';
+import 'leave_management.dart';
+import 'overtime_list_page.dart';
 
 class AnalyticsDashboard extends StatefulWidget {
   final Widget? bottomWidget;
@@ -360,11 +362,21 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
     return Row(
       children: [
         Expanded(
-          child: _buildSummaryCard('Submissions', '${data['totalSubmissions']}', Colors.indigo, Icons.post_add),
+          child: _buildSummaryCard('Submissions', '${data['totalSubmissions']}', Colors.indigo, Icons.post_add,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const OvertimeListPage()),
+            ),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _buildSummaryCard('Approved', '${data['approved']}', Colors.lightBlue, Icons.thumb_up),
+          child: _buildSummaryCard('Approved', '${data['approved']}', Colors.lightBlue, Icons.thumb_up,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const OvertimeListPage(filterStatus: 'Approved')),
+            ),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import '../../providers/current_user_provider.dart';
 import '../../repositories/notification_repository.dart';
+import '../../utils/empty_state_widget.dart';
 import '../home/home.dart';
 import '../profile/profile.dart';
 import '../schedule/schedule.dart';
@@ -86,7 +87,11 @@ class _NotificationPageState extends State<NotificationPage> {
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text("No notifications yet."));
+              return const EmptyStateWidget(
+                icon: Icons.notifications_off_outlined,
+                title: 'No notifications yet',
+                subtitle: 'You\'ll see updates about your requests and approvals here.',
+              );
             }
 
             final docs = snapshot.data!.docs.toList()
