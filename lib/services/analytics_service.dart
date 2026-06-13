@@ -209,23 +209,42 @@ class AnalyticsService {
 
   Future<Map<String, dynamic>> _getForecastStats() async {
     // Generate simple moving average for past 7 days
-    List<int> pastAttendance = [];
+    List<Map<String, dynamic>> pastAttendance = [];
     DateTime now = DateTime.now();
     for (int i = 6; i >= 0; i--) {
-      String dateStr = DateFormat('yyyy-MM-dd').format(now.subtract(Duration(days: i)));
+      DateTime day = now.subtract(Duration(days: i));
+      String dateStr = DateFormat('yyyy-MM-dd').format(day);
+      String displayDate = DateFormat('dd MMM').format(day);
+
       final attendanceSnapshot = await _firestore
           .collection('attendance')
           .where('date', isEqualTo: dateStr)
           .where('type', isEqualTo: 'in')
           .get();
-      pastAttendance.add(attendanceSnapshot.size);
+
+      List<String> employeeNames = [];
+      for(var doc in attendanceSnapshot.docs) {
+        final data = doc.data();
+        if (data.containsKey('name')) {
+          employeeNames.add(data['name'] as String);
+        } else {
+          employeeNames.add('Unknown');
+        }
+      }
+
+      pastAttendance.add({
+        'dateStr': dateStr,
+        'displayDate': displayDate,
+        'count': attendanceSnapshot.size,
+        'employees': employeeNames,
+      });
     }
 
     double avgAttendance = pastAttendance.isNotEmpty
-        ? pastAttendance.reduce((a, b) => a + b) / pastAttendance.length
+        ? pastAttendance.map((e) => e['count'] as int).reduce((a, b) => a + b) / pastAttendance.length
         : 0;
 
-    int lastVal = pastAttendance.isNotEmpty ? pastAttendance.last : 0;
+    int lastVal = pastAttendance.isNotEmpty ? pastAttendance.last['count'] as int : 0;
 
     return {
       'past7Days': pastAttendance,

@@ -424,16 +424,18 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
     );
   }
 
-  Widget _buildAttendanceTrendChart(List<int> past7Days) {
+  Widget _buildAttendanceTrendChart(List<dynamic> past7Days) {
     if (past7Days.isEmpty) return const Center(child: Text('No data'));
     List<BarChartGroupData> barGroups = [];
     for (int i = 0; i < past7Days.length; i++) {
+      final dayData = past7Days[i] as Map<String, dynamic>;
+      final count = dayData['count'] as int;
       barGroups.add(
         BarChartGroupData(
           x: i,
           barRods: [
             BarChartRodData(
-              toY: past7Days[i].toDouble(),
+              toY: count.toDouble(),
               color: Colors.blueAccent,
               width: 16,
               borderRadius: BorderRadius.circular(4),
@@ -443,20 +445,43 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
       );
     }
 
+    int maxVal = past7Days.map((e) => e['count'] as int).reduce((a, b) => a > b ? a : b);
+
     return BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
-        maxY: (past7Days.reduce((a, b) => a > b ? a : b) + 5).toDouble(),
-        barTouchData: BarTouchData(enabled: false),
+        maxY: (maxVal + 5).toDouble(),
+        barTouchData: BarTouchData(
+          enabled: true,
+          touchTooltipData: BarTouchTooltipData(
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              final dayData = past7Days[group.x] as Map<String, dynamic>;
+              final count = dayData['count'] as int;
+              final employees = (dayData['employees'] as List<dynamic>).cast<String>();
+              
+              String text = '${dayData['displayDate']}\nAttendance: $count';
+              if (employees.isNotEmpty) {
+                 text += '\n\n' + employees.join('\n');
+              }
+              
+              return BarTooltipItem(
+                text,
+                const TextStyle(color: Colors.white, fontSize: 12),
+              );
+            },
+          ),
+        ),
         titlesData: FlTitlesData(
           show: true,
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (double value, TitleMeta meta) {
+                if (value.toInt() < 0 || value.toInt() >= past7Days.length) return const SizedBox.shrink();
+                final dayData = past7Days[value.toInt()] as Map<String, dynamic>;
                 return Padding(
                   padding: const EdgeInsets.only(top: 8.0),
-                  child: Text('D-${6 - value.toInt()}', style: const TextStyle(fontSize: 10)),
+                  child: Text(dayData['displayDate'], style: const TextStyle(fontSize: 10)),
                 );
               },
             ),
